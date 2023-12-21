@@ -1,0 +1,94 @@
+
+<html>
+
+<head>
+
+    <title>Form</title>
+
+</head>
+
+<body>
+
+    <h1>FORM</h1>
+
+    <form onsubmit="onSubmit(event)">
+
+        <label>First name</label>
+
+        <input type="text" name="first_name">
+        <br/><br/>
+
+        <label>Email</label>
+
+        <input type="email" name="email">
+        <br/><br/>
+
+        <label>Last Name</label>
+
+        <input type="text" name="last_name">
+        <br/><br/>
+        <label>Customer Id</label>
+
+        <input type="text" name="customer_id">
+        <br/><br/>
+        <label>Loan Id</label>
+
+        <input type="text" name="loan_id">
+        <br/><br/>
+      
+
+    
+
+        <button type="submit">Submit</button>
+        <br/><br/>
+
+    </form>
+
+    <script>
+
+        // ... (other parts of your HTML and script)
+
+async function onSubmit(event) {
+    try {
+        event.preventDefault();
+        const requestToSend = [];
+
+        const formData = {
+            email: document.querySelector('[name="email"]').value,
+            first_name: document.querySelector('[name="first_name"]').value,
+            last_name: document.querySelector('[name="last_name"]').value,
+        };
+
+        requestToSend.push(formData);
+
+        const jsonData = JSON.stringify(requestToSend);
+
+        var client = new XMLHttpRequest();
+        client.open("POST", "https://ven06798.service-now.com/api/x_rptp_loan_closu/getloandata/postData");
+        client.setRequestHeader('Accept', 'application/json');
+        client.setRequestHeader('Content-Type', 'application/json');
+        client.setRequestHeader('Authorization', 'Basic ' + btoa('bindushree.nageshwara' + ':' + 'Fun4ever@123'));
+
+        client.onreadystatechange = function() {
+            if (this.readyState == XMLHttpRequest.DONE) {
+                if (this.status == 200) {
+                    console.log("Success:", this.responseText);
+                } else {
+                    console.error("Error:", this.status, this.statusText);
+                }
+            }
+        };
+
+        client.send(jsonData);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
+    </script>
+
+</body>
+
+</html>
