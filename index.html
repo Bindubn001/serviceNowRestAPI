@@ -1,92 +1,176 @@
-
 <html>
 
 <head>
-
     <title>Form</title>
-
 </head>
 
 <body>
-
     <h1>FORM</h1>
 
     <form onsubmit="onSubmit(event)">
 
         <label>First name</label>
-
-        <input type="text" name="first_name">
-        <br/><br/>
+        <input type="text" name="first_name" value="" readonly>
+        <br /><br />
 
         <label>Email</label>
-
-        <input type="email" name="email">
-        <br/><br/>
+        <input type="email" name="email" value="" readonly>
+        <br /><br />
 
         <label>Last Name</label>
+        <input type="text" name="last_name" value="" readonly>
+        <br /><br />
 
-        <input type="text" name="last_name">
-        <br/><br/>
-        <label>Customer Id</label>
-
-        <input type="text" name="customer_id">
-        <br/><br/>
         <label>Loan Id</label>
+        <input type="text" name="loan_id" value="" readonly>
+        <br /><br />
 
-        <input type="text" name="loan_id">
-        <br/><br/>
-      
+        <label>Branch for collection</label>
+        <select name="branch_for_collection">
+            <option value="1">KR Puram</option>
+            <option value="2">VV Puram</option>
+            <option value="3">Jayanagar</option>
+            <option value="4">Indiranagar</option>
+        </select>
+        <br /><br />
 
-    
+        <label>Mode of document retrieval</label>
+        <select name="mode_of_document_retrieval">
+            <option value="from_branch">Through Branch</option>
+            <option value="through_courier">Through Courier</option>
+        </select>
+        <br /><br />
+
+        <label>Courier Address</label>
+        <input type="text" name="courier_address">
+        <br /><br />
 
         <button type="submit">Submit</button>
-        <br/><br/>
+        <br /><br />
 
     </form>
 
     <script>
+        window.onload = function () {
 
-        // ... (other parts of your HTML and script)
-
-async function onSubmit(event) {
-    try {
-        event.preventDefault();
-        const requestToSend = [];
-
-        const formData = {
-            email: document.querySelector('[name="email"]').value,
-            first_name: document.querySelector('[name="first_name"]').value,
-            last_name: document.querySelector('[name="last_name"]').value,
+            getData();
         };
 
-        requestToSend.push(formData);
+        function getData() {
+            try {
+                console.log("haii");
 
-        const jsonData = JSON.stringify(requestToSend);
+                var first_name = "";
+                var last_name = "";
+                var email = "";
 
-        var client = new XMLHttpRequest();
-        client.open("POST", "https://ven06798.service-now.com/api/x_rptp_loan_closu/getloandata/postData");
-        client.setRequestHeader('Accept', 'application/json');
-        client.setRequestHeader('Content-Type', 'application/json');
-        client.setRequestHeader('Authorization', 'Basic ' + btoa('bindushree.nageshwara' + ':' + 'Fun4ever@123'));
+                function getQueryParam(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    console.log(urlParams);
+                    return urlParams.get(name);
+                }
 
-        client.onreadystatechange = function() {
-            if (this.readyState == XMLHttpRequest.DONE) {
-                if (this.status == 200) {
-                    console.log("Success:", this.responseText);
-                } else {
-                    console.error("Error:", this.status, this.statusText);
+                // Get the value of the 'yourQueryParam' query parameter from the URL
+                var yourQueryParamValue = getQueryParam('loanid');
+                console.log(yourQueryParamValue);
+
+                // Modify the API URL by appending the query parameter
+                var apiUrl = "https://ven06798.service-now.com/api/x_rptp_loan_closu/getloandata/getdata";
+                if (yourQueryParamValue) {
+                    apiUrl += "?loanid=" + yourQueryParamValue;
+                }
+                console.log(apiUrl);
+
+                var requestBody = apiUrl;
+
+                var client = new XMLHttpRequest();
+                client.open("GET", apiUrl);
+
+                client.setRequestHeader('Accept', 'application/json');
+                client.setRequestHeader('Content-Type', 'application/json');
+                client.setRequestHeader('Authorization', 'Basic ' + btoa('bindushree.nageshwara' + ':' + 'Fun4ever@123'));
+                client.send(requestBody);
+
+                client.onreadystatechange = function () {
+                    if (this.readyState == XMLHttpRequest.DONE) {
+                        if (this.status == 200) {
+                            // Successful response
+                            console.log("Response:", this.responseText);
+                            var responseJson = JSON.parse(this.responseText);
+
+                            // Accessing the object inside the "result" array
+                            var resultObject = responseJson.result[0];
+
+                            // Logging the result object
+                            console.log("Result Object:", resultObject);
+                            first_name = resultObject.first_name;
+                            last_name = resultObject.last_name;
+                            email=resultObject.email;
+                            loan_id = resultObject.loan_id;
+                            console.log(first_name + " " + last_name);
+                             document.querySelector('[name="first_name"]').value = first_name;
+                             document.querySelector('[name="last_name"]').value = last_name;
+                             document.querySelector('[name="email"]').value = email;
+                             document.querySelector('[name="loan_id"]').value = loan_id;
+
+                             
+                             
+
+                        }
+
+                    }
                 }
             }
-        };
-
-        client.send(jsonData);
-    } catch (error) {
-        console.error(error);
-    }
-}
+            catch (error) {
+                console.log(error);
+            }
 
 
+        }
+        async function onSubmit(event) {
 
+            event.preventDefault();
+
+
+            const requestToSend = [];
+
+            const formData = {
+                mode_of_document_retrieval: document.querySelector('[name="mode_of_document_retrieval"]').value,
+                branch_for_collection: document.querySelector('[name="branch_for_collection"]').value,
+                courier_address: document.querySelector('[name="courier_address"]').value,
+                loan_id 
+                
+            };
+
+            requestToSend.push(formData);
+
+            const jsonData = JSON.stringify(requestToSend);
+            console.log(jsonData);
+            try {
+                var client = new XMLHttpRequest();
+                client.open("POST", "https://ven06798.service-now.com/api/x_rptp_loan_closu/getloandata/postDocData");
+                client.setRequestHeader('Accept', 'application/json');
+                client.setRequestHeader('Content-Type', 'application/json');
+                client.setRequestHeader('Authorization', 'Basic ' + btoa('bindushree.nageshwara' + ':' + 'Fun4ever@123'));
+
+
+                client.onreadystatechange = function () {
+                    if (this.readyState == XMLHttpRequest.DONE) {
+                        if (this.status == 200) {
+                            console.log("Success:", this.responseText);
+                        } else {
+                            console.error("Error:");
+                        }
+                    }
+                };
+
+
+                client.send(jsonData);
+            } catch (error) {
+                console.error(error);
+            }
+
+        }
     </script>
 
 </body>
